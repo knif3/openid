@@ -22,8 +22,8 @@ use crate::{
     validation::{
         validate_token_aud, validate_token_exp, validate_token_issuer, validate_token_nonce,
     },
-    Bearer, Claims, Config, Configurable, Discovered, IdToken, OAuth2Error, Options, Provider,
-    StandardClaims, Token, TokenIntrospection, Userinfo,
+    Bearer, Claims, Config, Configurable, Discovered, IdToken, OAuth2Error, OAuth2ErrorCode,
+    Options, Provider, StandardClaims, Token, TokenIntrospection, Userinfo,
 };
 
 /// OpenID Connect 1.0 / OAuth 2.0 client.
@@ -728,20 +728,25 @@ where
         &self,
         token: impl AsRef<Bearer>,
         scope: impl Into<Option<&str>>,
-    ) -> Result<Bearer, ClientError> {
+    ) -> Result<Option<Bearer>, ClientError> {
         // Ensure the non thread-safe `Serializer` is not kept across
         // an `await` boundary by localizing it to this inner scope.
         let body = {
             let mut body = Serializer::new(String::new());
             body.append_pair("grant_type", "refresh_token");
-            body.append_pair(
-                "refresh_token",
-                token
-                    .as_ref()
-                    .refresh_token
-                    .as_deref()
-                    .expect("No refresh_token field"),
-            );
+
+            match token.as_ref().refresh_token.as_deref() {
+                Some(value) => {
+                    body.append_pair("refresh_token", value);
+                }
+                None => {
+                    return Err(ClientError::from(OAuth2Error {
+                        error: OAuth2ErrorCode::InvalidGrant,
+                        error_description: None,
+                        error_uri: None,
+                    }));
+                }
+            }
 
             self.append_scope(&mut body, scope);
 
@@ -755,18 +760,18 @@ where
         if new_token.refresh_token.is_none() {
             new_token.refresh_token = token.as_ref().refresh_token.clone();
         }
-        Ok(new_token)
+        Ok(Some(new_token))
     }
 
     /// Ensures an access token is valid by refreshing it if necessary.
     pub async fn ensure_token(
         &self,
         token_guard: TemporalBearerGuard,
-    ) -> Result<TemporalBearerGuard, ClientError> {
+    ) -> Option<Result<TemporalBearerGuard, ClientError>> {
         if token_guard.expired() {
-            self.refresh_token(token_guard, None).await.map(From::from)
+            Some(self.refresh_token(token_guard, None).await.map(From::from))
         } else {
-            Ok(token_guard)
+            None
         }
     }
 
