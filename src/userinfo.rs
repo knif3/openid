@@ -59,6 +59,9 @@ pub struct Userinfo {
     /// End-User.
     pub picture: Option<Url>,
     #[serde(default)]
+    /// List of End-User's group memberships.
+    pub groups: Vec<String>,
+    #[serde(default)]
     /// URL of the End-User's Web page or blog. This Web page SHOULD contain
     /// information published by the End-User or an organization that the
     /// End-User is affiliated with.
