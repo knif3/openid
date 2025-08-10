@@ -57,11 +57,19 @@ pub struct Bearer {
 /// Manages bearer tokens along with their expiration times.
 #[derive(Debug)]
 pub struct TemporalBearerGuard {
-    pub bearer: Bearer,
-    pub expires_at: Option<DateTime<Utc>>,
+    bearer: Bearer,
+    expires_at: Option<DateTime<Utc>>,
 }
 
 impl TemporalBearerGuard {
+    /// Creates new TemporalBearerGuard.
+    pub fn new(bearer: Bearer, expires_at: Option<DateTime<Utc>>) -> Self {
+        TemporalBearerGuard {
+            bearer,
+            expires_at,
+        }
+    }
+
     /// Calculates whether the bearer has expired.
     ///
     /// The current time is compared to `self.expires_at` and a boolean
@@ -72,8 +80,9 @@ impl TemporalBearerGuard {
             .unwrap_or_default()
     }
 
-    pub fn bearer(&self) -> Bearer {
-        self.bearer.clone()
+    /// Returns the bearer object.
+    pub fn bearer(&self) -> &Bearer {
+        &self.bearer
     }
 
     /// Calculates whether the bearer will expire at a given point in time.
@@ -91,15 +100,14 @@ impl AsRef<Bearer> for TemporalBearerGuard {
     }
 }
 
-impl From<Option<Bearer>> for TemporalBearerGuard {
-    fn from(bearer: Option<Bearer>) -> Self {
+impl From<Bearer> for TemporalBearerGuard {
+    fn from(bearer: Bearer) -> Self {
         let expires_at = bearer
-            .clone()
-            .unwrap()
             .expires_in
+            .clone()
             .map(|expires_in| Utc::now() + Duration::seconds(expires_in as i64));
         Self {
-            bearer: bearer.unwrap(),
+            bearer,
             expires_at,
         }
     }

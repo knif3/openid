@@ -728,7 +728,7 @@ where
         &self,
         token: impl AsRef<Bearer>,
         scope: impl Into<Option<&str>>,
-    ) -> Result<Option<Bearer>, ClientError> {
+    ) -> Result<Bearer, ClientError> {
         // Ensure the non thread-safe `Serializer` is not kept across
         // an `await` boundary by localizing it to this inner scope.
         let body = {
@@ -742,7 +742,7 @@ where
                 None => {
                     return Err(ClientError::from(OAuth2Error {
                         error: OAuth2ErrorCode::InvalidGrant,
-                        error_description: None,
+                        error_description: Some(String::from("No refresh_token field")),
                         error_uri: None,
                     }));
                 }
@@ -760,7 +760,7 @@ where
         if new_token.refresh_token.is_none() {
             new_token.refresh_token = token.as_ref().refresh_token.clone();
         }
-        Ok(Some(new_token))
+        Ok(new_token)
     }
 
     /// Ensures an access token is valid by refreshing it if necessary.
@@ -769,7 +769,10 @@ where
         token_guard: TemporalBearerGuard,
     ) -> Option<Result<TemporalBearerGuard, ClientError>> {
         if token_guard.expired() {
-            Some(self.refresh_token(token_guard, None).await.map(From::from))
+            Some(match self.refresh_token(token_guard, None).await {
+                Ok(bearer) => Ok(From::from(bearer)),
+                Err(e) => Err(e),
+            })
         } else {
             None
         }
