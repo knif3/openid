@@ -1,6 +1,6 @@
 [package]
 name = "openid"
-version = "0.18.0"
+version = "0.18.2"
 authors = ["Alexander Korolev <alexander.korolev.germany@gmail.com>"]
 edition = "2021"
 categories = ["authentication"]
@@ -22,6 +22,9 @@ uma2 = []
 native-tls = ["reqwest/native-tls"]
 rustls = ["reqwest/rustls-tls"]
 rustls-native-roots = ["reqwest/rustls-tls-native-roots"]
+
+[package.metadata.docs.rs]
+features = ["all"]
 
 [dependencies]
 serde_json = { version = "1", default-features = false }
