@@ -1,6 +1,6 @@
 [package]
 name = "openid"
-version = "0.18.3"
+version = "0.20.1"
 authors = ["Alexander Korolev <alexander.korolev.germany@gmail.com>"]
 edition = "2021"
 categories = ["authentication"]
@@ -16,12 +16,12 @@ rust-version = "1.84.0"
 
 [features]
 default = ["native-tls"]
-all = ["microsoft", "uma2", "native-tls", "rustls-native-roots"]
+all = ["microsoft", "uma2", "native-tls", "rustls-native-certs"]
 microsoft = []
 uma2 = []
 native-tls = ["reqwest/native-tls"]
-rustls = ["reqwest/rustls-tls"]
-rustls-native-roots = ["reqwest/rustls-tls-native-roots"]
+rustls = ["reqwest/rustls"]
+rustls-native-certs = ["reqwest/rustls-native-certs"]
 
 [package.metadata.docs.rs]
 features = ["all"]
@@ -30,7 +30,7 @@ features = ["all"]
 serde_json = { version = "1", default-features = false }
 base64 = "0.22"
 biscuit = "0.7"
-thiserror = "1"
+thiserror = "2"
 validator = { version = "0.20", features = ["derive"] }
 mime = "0.3"
 getrandom = { version = "0.3", default-features = false, features = ["std"] }
@@ -52,6 +52,6 @@ default-features = false
 features = ["derive"]
 
 [dependencies.reqwest]
-version = "0.12"
+version = "0.13"
 default-features = false
 features = ["json"]
