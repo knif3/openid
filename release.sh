@@ -2,6 +2,14 @@
 
 set -e
 
+# Check that we are on the master branch
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+if [ "$CURRENT_BRANCH" != "master" ]; then
+    echo "Error: release.sh must be run on the master branch"
+    echo "Current branch: $CURRENT_BRANCH"
+    exit 1
+fi
+
 RELEASE_TYPE=${RELEASE_TYPE:-minor}
 
 if [ "${RELEASE_TYPE}" != "current" ]; then

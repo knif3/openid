@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use chrono::Duration;
 
-use crate::{Display, Prompt};
+use crate::{Display, Prompt, response_mode::ResponseMode};
 
 /// Optional request parameters.
 ///
@@ -116,4 +116,12 @@ pub struct Options {
     /// specified in [Section 2](https://openid.net/specs/openid-connect-core-1_0.html#IDToken). The `acr` Claim is requested as a Voluntary
     /// Claim by this parameter.
     pub acr_values: Option<String>,
+    /// OPTIONAL. Informs the Authorization Server of the mechanism to be used
+    /// for returning parameters from the Authorization Endpoint.
+    ///
+    /// This parameter is defined in [OAuth 2.0 Multiple Response Type Encoding Practices](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest).
+    /// This use of this parameter is NOT RECOMMENDED when the Response Mode
+    /// that would be requested is the default mode specified for the Response
+    /// Type.
+    pub response_mode: Option<ResponseMode>,
 }
