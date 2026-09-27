@@ -12,8 +12,8 @@ use serde_json::Value;
 use url::{Url, form_urlencoded::Serializer};
 
 use crate::{
-    Bearer, Claims, Config, Configurable, Discovered, IdToken, OAuth2Error, Options, Provider,
-    StandardClaims, Token, TokenIntrospection, Userinfo,
+    Bearer, Claims, Config, Configurable, Discovered, IdToken, OAuth2Error, OAuth2ErrorCode,
+    Options, Provider, StandardClaims, Token, TokenIntrospection, Userinfo,
     bearer::TemporalBearerGuard,
     discovered,
     error::{
